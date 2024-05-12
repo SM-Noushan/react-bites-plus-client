@@ -47,6 +47,8 @@ const Header = () => {
           <div className="flex items-center gap-x-2 ms-auto py-1 md:ps-6 md:order-3 md:col-span-3">
             {loading ? (
               <div className="hidden lg:flex animate-pulse h-10 w-32 bg-gray-200 rounded-lg" />
+            ) : user ? (
+              ""
             ) : (
               <>
                 <Link
