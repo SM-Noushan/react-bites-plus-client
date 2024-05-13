@@ -33,7 +33,7 @@ const Signup = () => {
   const {
     user,
     loading: authLoading,
-    loading: setAuthLoading,
+    setLoading: setAuthLoading,
     createUser,
     updateProfileInfo,
   } = useAuth();
@@ -47,7 +47,6 @@ const Signup = () => {
   const navigate = useNavigate();
   const handleOnSubmit = (data) => {
     const { name, email, photoURL, password } = data;
-    console.log(data);
     createUser(email, password)
       .then(() => {
         toast.success("Registered successfully.");
@@ -58,7 +57,7 @@ const Signup = () => {
           })
           .catch(() => {
             setAuthLoading(false);
-            toast.warn("Failed to update profile, please try later.");
+            // toast.warn("Failed to create profile, please try later.");
           });
       })
       .catch((error) => {

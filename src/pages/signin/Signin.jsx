@@ -1,8 +1,80 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { Helmet } from "react-helmet-async";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import Spinner from "../../components/shared/Spinner";
+import useAuth from "../../hooks/useAuth";
+
+const errorSign = (
+  <div className="absolute inset-y-3 end-0 pointer-events-none pe-3">
+    <svg
+      className="size-5 text-red-500"
+      width="16"
+      height="16"
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+    >
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+    </svg>
+  </div>
+);
 
 const Signin = () => {
+  const {
+    createUserWithGoogle,
+    logIn,
+    user,
+    loading: authLoading,
+    setLoading: setAuthLoading,
+  } = useAuth();
+  const [credentialError, setCredentialError] = React.useState(false);
+  const [passwordShown, setPasswordShown] = React.useState(false);
+  const togglePasswordVisiblity = () => setPasswordShown((cur) => !cur);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const handleOnSubmit = (data) => {
+    const { email, password } = data;
+    logIn(email, password)
+      .then(() => {
+        setCredentialError(false);
+        toast.success("Signin successful");
+        if (location.state) console.log(location?.state);
+        navigate(location.state ? location.state : "/");
+      })
+      .catch(() => {
+        setAuthLoading(false);
+        setCredentialError(true);
+        toast.error("Error! Try again.");
+      });
+  };
+  const handleSocialSignUp = (provider) => {
+    provider()
+      .then(() => {
+        toast.success("Signin successful");
+        setCredentialError(false);
+        navigate(location?.state ? location.state : "/");
+      })
+      .catch(() => {
+        setAuthLoading(false);
+        toast.error("Error! Try again.");
+      });
+  };
+
+  if (authLoading) return <Spinner />;
+  if (user) return <Navigate to={location.state ? location.state : "/"} />;
   return (
     <section className="flex flex-wrap md:justify-start md:flex-nowrap py-7 relative max-w-7xl w-full px-4 md:px-6 lg:px-8 mx-auto font-open-sans">
+      <Helmet>
+        <title>Bites+ | Signin</title>
+      </Helmet>
       <div className="my-7 bg-white border border-gray-200 rounded-xl shadow-sm max-w-xl mx-auto w-full">
         <div className="p-4 sm:p-7">
           <div className="text-center">
@@ -10,7 +82,7 @@ const Signin = () => {
               Sign in
             </h1>
             <p className="mt-2 text-sm text-gray-600">
-              Don&apos;t have an account yet?
+              Don&apos;t have an account yet? &nbsp;
               <Link
                 className="text-blue-600 decoration-2 hover:underline font-medium"
                 to="/signup"
@@ -22,6 +94,7 @@ const Signin = () => {
 
           <div className="mt-5">
             <button
+              onClick={() => handleSocialSignUp(createUserWithGoogle)}
               type="button"
               className="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-400 bg-white text-gray-800 shadow-sm hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
             >
@@ -57,7 +130,7 @@ const Signin = () => {
             </div>
 
             {/* <!-- Form --> */}
-            <form>
+            <form onSubmit={handleSubmit(handleOnSubmit)}>
               <div className="grid gap-y-4">
                 {/* <!-- Form Group --> */}
                 <div>
@@ -69,31 +142,17 @@ const Signin = () => {
                       type="email"
                       id="email"
                       name="email"
+                      placeholder="email@example.com"
                       autoComplete="username"
                       className="py-3 px-4 block w-full border border-gray-300 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                       required
                       aria-describedby="email-error"
+                      {...register("email", {
+                        required: true,
+                      })}
                     />
-                    <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
-                      <svg
-                        className="size-5 text-red-500"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                        aria-hidden="true"
-                      >
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-                      </svg>
-                    </div>
+                    {errors?.email && errorSign}
                   </div>
-                  <p
-                    className="hidden text-xs text-red-600 mt-2"
-                    id="email-error"
-                  >
-                    Please include a valid email address so we can get back to
-                    you
-                  </p>
                 </div>
                 {/* <!-- End Form Group --> */}
 
@@ -104,41 +163,50 @@ const Signin = () => {
                       Password
                     </label>
                     {/* <a
-                        className="text-sm text-blue-600 decoration-2 hover:underline font-medium "
-                        href="../examples/html/recover-account.html"
-                      >
-                        Forgot password?
-                      </a> */}
+                      className="text-sm text-blue-600 decoration-2 hover:underline font-medium "
+                      href="../examples/html/recover-account.html"
+                    >
+                      Forgot password?
+                    </a> */}
                   </div>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={passwordShown ? "text" : "password"}
                       id="password"
                       name="password"
+                      placeholder="******"
                       autoComplete="current-password"
                       className="py-3 px-4 block w-full border border-gray-300 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                       required
                       aria-describedby="password-error"
+                      {...register("password", {
+                        required: {
+                          value: true,
+                          message: "Password required",
+                        },
+                        maxLength: {
+                          value: 20,
+                          message: "Max password length 20",
+                        },
+                      })}
                     />
-                    <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
-                      <svg
-                        className="size-5 text-red-500"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        viewBox="0 0 16 16"
-                        aria-hidden="true"
-                      >
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-                      </svg>
-                    </div>
+                    <button
+                      onClick={togglePasswordVisiblity}
+                      className={
+                        errors?.password
+                          ? "absolute right-10 top-3"
+                          : "absolute right-3 top-3"
+                      }
+                      type="button"
+                    >
+                      {passwordShown ? (
+                        <FaRegEye className="h-5 w-5" />
+                      ) : (
+                        <FaRegEyeSlash className="h-5 w-5" />
+                      )}
+                    </button>
+                    {errors?.password && errorSign}
                   </div>
-                  <p
-                    className="hidden text-xs text-red-600 mt-2"
-                    id="password-error"
-                  >
-                    8+ characters required
-                  </p>
                 </div>
                 {/* <!-- End Form Group --> */}
 
@@ -159,6 +227,31 @@ const Signin = () => {
                     </div>
                   </div> */}
                 {/* <!-- End Checkbox --> */}
+
+                {/* Error Message */}
+                <div>
+                  {(Object.entries(errors).length > 0 || credentialError) && (
+                    <p className="flex items-center gap-1 text-red-600 text-xs">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="-mt-px h-4 w-4 "
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {((errors?.email?.message || errors?.password?.message) &&
+                        !credentialError &&
+                        "Email and Password Required") ||
+                        (credentialError && "Invalid Credentials")}
+                    </p>
+                  )}
+                </div>
+                {/* End Error Message */}
 
                 <button
                   type="submit"
