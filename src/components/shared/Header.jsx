@@ -1,12 +1,24 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { toast } from "react-toastify";
 
 const Header = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, logOut } = useAuth();
+  const navigate = useNavigate();
   const navItemsCSS =
-    "relative inline-block text-black before:absolute before:bottom-0.5 before:start-0 before:-z-[1] before:w-full before:h-1";
+    "relative inline-block text-black before:w-full px-2 py-1 rounded-md";
   const dropdownItemsCSS =
     "flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm hover:bg-gray-100 relative text-black";
+  const handleSignout = () => {
+    logOut()
+      .then(() => {
+        toast.success("Signout successful");
+        navigate("/signin");
+      })
+      .catch(() => {
+        toast.error("Error! Try Again");
+      });
+  };
   return (
     <>
       {/* <!-- ========== HEADER ========== --> */}
@@ -48,7 +60,35 @@ const Header = () => {
             {loading ? (
               <div className="hidden lg:flex animate-pulse h-10 w-32 bg-gray-200 rounded-lg" />
             ) : user ? (
-              ""
+              <button
+                onClick={handleSignout}
+                className="flex items-center gap-x-2 font-semibold text-gray-500 hover:text-lime-600 sm:border-s sm:border-gray-300 sm:ps-6"
+              >
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="user-img"
+                    className="rounded-full size-7"
+                  />
+                ) : (
+                  <svg
+                    className="flex-shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                )}
+                Sign out
+              </button>
             ) : (
               <>
                 <Link
@@ -121,7 +161,9 @@ const Header = () => {
                 <NavLink
                   to="/"
                   className={({ isActive }) =>
-                    isActive ? `${navItemsCSS} before:bg-lime-400` : navItemsCSS
+                    isActive
+                      ? `${navItemsCSS} text-lime-400 md:border-2 md:border-lime-400`
+                      : `${navItemsCSS} hover:text-lime-400`
                   }
                 >
                   Home
@@ -131,13 +173,15 @@ const Header = () => {
                 <NavLink
                   to="/foods"
                   className={({ isActive }) =>
-                    isActive ? `${navItemsCSS} before:bg-lime-400` : navItemsCSS
+                    isActive
+                      ? `${navItemsCSS} text-lime-400 md:border-2 md:border-lime-400`
+                      : `${navItemsCSS} hover:text-lime-400`
                   }
                 >
                   Available Foods
                 </NavLink>
               </div>
-              <div className="hs-dropdown [--strategy:static] sm:[--strategy:fixed] [--adaptive:none] sm:[--trigger:hover] sm:py-4">
+              <div className="hs-dropdown [--strategy:static] sm:[--strategy:fixed] [--adaptive:none] sm:[--trigger:hover] sm:py-4 px-2.5">
                 <button
                   type="button"
                   className="flex items-center w-full text-black hover:text-gray-500 font-medium"
