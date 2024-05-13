@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import FoodCard from "../FoodCard";
+import CardSkeleton from "../shared/CardSkeleton";
 
 const FeaturedFoods = () => {
   return (
@@ -24,6 +25,7 @@ const FeaturedFoods = () => {
           <FoodCard />
           <FoodCard />
           <FoodCard />
+          {/* <CardSkeleton /> */}
         </div>
         {/* <!-- End Grid --> */}
 
