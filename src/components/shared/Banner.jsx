@@ -6,7 +6,7 @@ const slide = (highlight, label, desc) => {
       <div className="flex flex-col justify-center h-full px-6">
         {/* <!-- Title --> */}
         <div className="mt- max-w-2xl">
-          <h1 className="block font-semibold text-gray-800 text-4xl md:text-5xl lg:text-6xl">
+          <h1 className="block font-semibold text-gray-800 text-4xl md:text-5xl lg:text-6xl font-playfair-display">
             <span className="text-lime-600">{highlight}</span> {label}
           </h1>
         </div>
@@ -47,7 +47,7 @@ const Banner = () => {
   return (
     <section>
       {/* <!-- Hero --> */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden font-open-sans">
         {/* <!-- Slider --> */}
         <div
           data-hs-carousel='{"loadingClasses": "opacity-0","isAutoPlay": true, "speed":  1500}'
