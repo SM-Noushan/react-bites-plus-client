@@ -6,8 +6,10 @@ import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
 import AddFoodErrorMsg from "./AddFoodErrorMsg";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const AddFood = ({ variant = null, children }) => {
+  const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const currentDate = moment().format("YYYY-MM-DD");
   const [monitorFoodStatus, setMonitorFoodStatus] = React.useState("available");
@@ -15,12 +17,21 @@ const AddFood = ({ variant = null, children }) => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
   const handleLocalSubmit = (data) => {
     data.donatorName = user?.displayName;
     data.donatorEmail = user?.email;
     data.donatorPhotoURL = user?.photoURL;
-    console.log(data);
+    data.donatorUID = user?.uid;
+    axiosSecure.post("/food", data).then((res) => {
+      console.log(res);
+      if (res.data.insertedId) {
+        setMonitorFoodStatus("available");
+        reset();
+        toast.success("Successfully Added");
+      } else toast.error("Failed to add. Try again");
+    });
   };
   return (
     <>
@@ -199,22 +210,25 @@ const AddFood = ({ variant = null, children }) => {
 
                 {/* food location */}
                 <div>
-                  <label htmlFor="foodLocation" className="block text-sm mb-2">
+                  <label
+                    htmlFor="pickupLocation"
+                    className="block text-sm mb-2"
+                  >
                     Pickup Location
                   </label>
                   <div className="relative">
                     <input
                       type="text"
-                      id="foodLocation"
-                      name="foodLocation"
+                      id="pickupLocation"
+                      name="pickupLocation"
                       placeholder="Enter food location"
                       className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                       aria-describedby="foodImage-error"
                       readOnly={variant}
-                      {...register("foodLocation", { required: true })}
+                      {...register("pickupLocation", { required: true })}
                     />
                   </div>
-                  {errors?.foodLocation && (
+                  {errors?.pickupLocation && (
                     <AddFoodErrorMsg message="Food Location" />
                   )}
                 </div>
