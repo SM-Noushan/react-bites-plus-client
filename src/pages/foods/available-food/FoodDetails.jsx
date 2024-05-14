@@ -1,5 +1,25 @@
 import React from "react";
 import { FaUsers } from "react-icons/fa6";
+import AddFood from "../add-food/AddFood";
+
+const inputFiled = (label, idName, val) => (
+  <div>
+    <label htmlFor="foodName" className="block text-sm mb-2">
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type="text"
+        id={idName}
+        name={idName}
+        className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
+        aria-describedby="foodName-error"
+        defaultValue={val}
+        readOnly
+      />
+    </div>
+  </div>
+);
 
 const FoodDetails = () => {
   return (
@@ -53,12 +73,12 @@ const FoodDetails = () => {
 
             <div className="mt-5">
               <button
-                className="inline-flex items-center gap-x-1.5 text-lime-600 decoration-2 hover:underline font-medium"
-                href="#"
+                className="inline-flex items-center gap-x-1.5 text-lime-600 decoration-2 font-medium bg-lime-50/70 hover:bg-lime-50 px-3 py-2.5 border-2 border-lime-400 rounded-lg"
+                data-hs-overlay="#food-request-modal"
               >
-                Read more
+                Request Food
                 <svg
-                  className="flex-shrink-0 size-4"
+                  className="flex-shrink-0 size-4 rotate-90"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -79,6 +99,92 @@ const FoodDetails = () => {
         {/* <!-- End Grid --> */}
       </div>
       {/* <!-- End Card Blog --> */}
+      {/* modal */}
+      <div>
+        <div
+          id="food-request-modal"
+          className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
+        >
+          <div className="hs-overlay-open:mt-7 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-0 opacity-0 ease-out transition-all sm:max-w-lg sm:w-full m-3 sm:mx-auto h-[calc(100%-3.5rem)] min-h-[calc(100%-3.5rem)] flex items-center">
+            <div className="w-full max-h-full overflow-hidden flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-3 px-4 border-b">
+                <h3 className="font-bold text-gray-800">Request Food</h3>
+                <button
+                  type="button"
+                  className="flex justify-center items-center size-7 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
+                  data-hs-overlay="#food-request-modal"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="flex-shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Food Information
+                    </h3>
+                    <AddFood variant={true}>
+                      {inputFiled("Food Id", "foodId", "id1727838919838")}
+                      {inputFiled("Donator Email", "donatorEmail", "donator@example.com")}
+                      {inputFiled("Donator Name", "donatorName", "donator name")}
+                      {inputFiled("Requester Name", "requesterName", "requester name")}
+                    </AddFood>
+                    <form className="px-8 sm:px-13 lg:px-16">
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="requesterNotes"
+                          className="block text-sm mb-2"
+                        >
+                          My Notes
+                        </label>
+
+                        <textarea
+                          id="requesterNotes"
+                          name="requesterNotes"
+                          className="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
+                          rows="6"
+                          placeholder="Please provide any additional information or notes here..."
+                          //   {...register("requesterNotes")}
+                        />
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                  data-hs-overlay="#food-request-modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  Make Request
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
