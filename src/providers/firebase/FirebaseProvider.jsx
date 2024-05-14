@@ -11,10 +11,12 @@ import {
 } from "firebase/auth";
 import PropTypes from "prop-types";
 import auth from "../../firebase/firebase.config";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export const AuthContext = React.createContext("");
 
 const FirebaseProvider = ({ children }) => {
+  const axiosSecure = useAxiosSecure();
   const facebookProvider = new FacebookAuthProvider();
   const googleProvider = new GoogleAuthProvider();
   const [user, setUser] = React.useState(null);
@@ -22,9 +24,19 @@ const FirebaseProvider = ({ children }) => {
 
   React.useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currUser) => {
+      const logged = { email: currUser?.email || user?.email };
       console.log("user >> ", currUser);
       setUser(currUser);
       setLoading(false);
+      if (currUser) {
+        axiosSecure
+          .post("/signin", logged)
+          .then((res) => console.log("token-setup >>", res.data));
+      } else {
+        axiosSecure
+          .post("/signout", logged)
+          .then((res) => console.log("token-clear >>", res.data));
+      }
     });
     return () => unSubscribe();
   }, []);

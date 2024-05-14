@@ -41,7 +41,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/foods/manage",
-        element: <ManageMyFood />,
+        element: <ManageMyFood type="manage" />,
+      },
+      {
+        path: "/foods/request",
+        element: <ManageMyFood type="request" />,
       },
     ],
   },
