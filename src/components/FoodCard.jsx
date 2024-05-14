@@ -62,7 +62,10 @@ const FoodCard = () => {
             <h5 className="text-sm text-gray-800">By, Lauren Waller</h5>
           </div>
         </div>
-        <Link className="text-emerald-400 text-xl hover:text-white hover:bg-lime-400 p-2 rounded-full">
+        <Link
+          to={`/food/id`}
+          className="text-emerald-400 text-xl hover:text-white hover:bg-lime-400 p-2 rounded-full"
+        >
           <FaArrowRightFromBracket />
         </Link>
       </div>

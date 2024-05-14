@@ -70,7 +70,7 @@ const AvailableFood = () => {
           </div>
         </div>
 
-        <div className="w-56 mb-4">
+        <div className="w-60 mb-4">
           {/* <!-- Select --> */}
           <select
             id="filter"
