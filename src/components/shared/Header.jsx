@@ -177,6 +177,7 @@ const Header = () => {
                       ? `${navItemsCSS} text-lime-400 md:border-2 md:border-lime-400`
                       : `${navItemsCSS} hover:text-lime-400`
                   }
+                  end
                 >
                   Available Foods
                 </NavLink>
@@ -215,7 +216,7 @@ const Header = () => {
                     Add Food
                   </NavLink>
                   <NavLink
-                    to="/food/manage"
+                    to="/foods/manage"
                     className={({ isActive }) =>
                       isActive
                         ? `ring-2 ring-lime-400 ${dropdownItemsCSS}`
@@ -225,7 +226,7 @@ const Header = () => {
                     Manage My Foods
                   </NavLink>
                   <NavLink
-                    to="/food/request"
+                    to="/foods/request"
                     className={({ isActive }) =>
                       isActive
                         ? `ring-2 ring-lime-400 ${dropdownItemsCSS}`

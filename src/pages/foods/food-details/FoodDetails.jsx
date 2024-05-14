@@ -1,5 +1,5 @@
-import React from "react";
 import { FaUsers } from "react-icons/fa6";
+import { Helmet } from "react-helmet-async";
 import AddFood from "../add-food/AddFood";
 
 const inputFiled = (label, idName, val) => (
@@ -26,6 +26,9 @@ const FoodDetails = () => {
     <section>
       {/* <!-- Card Blog --> */}
       <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+        <Helmet>
+          <title>Bites+ | Food Name</title>
+        </Helmet>
         {/* <!-- Grid --> */}
         <div className="grid sm:grid-cols-2 sm:items-center gap-8">
           <div className="sm:order-2">
@@ -140,9 +143,21 @@ const FoodDetails = () => {
                     </h3>
                     <AddFood variant={true}>
                       {inputFiled("Food Id", "foodId", "id1727838919838")}
-                      {inputFiled("Donator Email", "donatorEmail", "donator@example.com")}
-                      {inputFiled("Donator Name", "donatorName", "donator name")}
-                      {inputFiled("Requester Name", "requesterName", "requester name")}
+                      {inputFiled(
+                        "Donator Email",
+                        "donatorEmail",
+                        "donator@example.com"
+                      )}
+                      {inputFiled(
+                        "Donator Name",
+                        "donatorName",
+                        "donator name"
+                      )}
+                      {inputFiled(
+                        "Requester Name",
+                        "requesterName",
+                        "requester name"
+                      )}
                     </AddFood>
                     <form className="px-8 sm:px-13 lg:px-16">
                       <div className="space-y-2">

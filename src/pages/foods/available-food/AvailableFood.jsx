@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import FoodCard from "../../../components/FoodCard";
 import React from "react";
+import { Helmet } from "react-helmet-async";
 
 const AvailableFood = () => {
   const [filter, setFiler] = React.useState("0");
@@ -19,6 +20,9 @@ const AvailableFood = () => {
     <>
       {/* <!-- Card Blog --> */}
       <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-open-sans">
+        <Helmet>
+          <title>Bites+ | Available Foods</title>
+        </Helmet>
         {/* <!-- Title --> */}
         <div className="max-w-2xl mx-auto text-center mb-10 lg:mb-14">
           <h2 className="text-2xl font-bold md:text-4xl md:leading-tight font-playfair-display">
