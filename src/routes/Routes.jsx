@@ -5,6 +5,7 @@ import Error from "../pages/error/Error";
 import Signin from "../pages/signin/Signin";
 import Signup from "../pages/signup/Signup";
 import AddFood from "../pages/foods/add-food/AddFood";
+import AvailableFood from "../pages/foods/available-food/AvailableFood";
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
       {
         path: "/signup",
         element: <Signup />,
+      },
+      {
+        path: "/foods",
+        element: <AvailableFood />,
       },
       {
         path: "/food/add",
