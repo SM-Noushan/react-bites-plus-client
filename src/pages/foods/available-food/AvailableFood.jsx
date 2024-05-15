@@ -9,6 +9,7 @@ import CardSkeleton from "../../../components/shared/CardSkeleton";
 const AvailableFood = () => {
   const [filter, setFiler] = React.useState("0");
   const [search, setSearch] = React.useState(null);
+  const [layout, setLayout] = React.useState(true);
   const axiosSecure = useAxiosSecure();
 
   const { data: foods, isLoading } = useQuery({
@@ -81,12 +82,13 @@ const AvailableFood = () => {
           </div>
         </div>
 
-        <div className="w-60 mb-4">
-          {/* <!-- Select --> */}
-          <select
-            id="filter"
-            defaultValue={filter}
-            data-hs-select='{
+        <div className="flex items-center justify-between">
+          <div className="w-60 mb-4">
+            {/* <!-- Select --> */}
+            <select
+              id="filter"
+              defaultValue={filter}
+              data-hs-select='{
                 "placeholder": "<span class=\"inline-flex items-center\"><svg class=\"flex-shrink-0 size-3.5 me-2\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"/></svg> Filter</span>",
                 "toggleTag": "<button type=\"button\"></button>",
                 "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-lime-500 focus:ring-lime-500 before:absolute before:inset-0 before:z-[1]",
@@ -95,18 +97,28 @@ const AvailableFood = () => {
                 "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
                 "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"flex-shrink-0 size-3.5 text-gray-500 dark:text-neutral-500\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
               }'
-            className=""
-          >
-            {/* <option value="">Filter</option> */}
-            <option value="0">Default</option>
-            <option value="1">Expired Date (Ascending)</option>
-            <option value="-1">Expired Date (Descending)</option>
-          </select>
-          {/* <!-- End Select --> */}
+              className=""
+            >
+              {/* <option value="">Filter</option> */}
+              <option value="0">Default</option>
+              <option value="1">Expired Date (Ascending)</option>
+              <option value="-1">Expired Date (Descending)</option>
+            </select>
+            {/* <!-- End Select --> */}
+          </div>
+          <div>
+            <button
+              onClick={() => setLayout(!layout)}
+              className="hidden lg:inline-flex py-3 px-4 items-center text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none"
+              to="/foods"
+            >
+              Change Layouts
+            </button>
+          </div>
         </div>
 
         {/* <!-- Grid --> */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid sm:grid-cols-2 lg:${layout ? "grid-cols-3" : "grid-cols-2"} gap-6`}>
           {isLoading ? (
             <>
               <CardSkeleton />
