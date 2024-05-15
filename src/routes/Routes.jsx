@@ -42,7 +42,13 @@ export const router = createBrowserRouter([
       },
       {
         path: "/food/:id",
-        element: <FoodDetails />,
+        element: (
+          <PrivateRoutes>
+            <FoodDetails />
+          </PrivateRoutes>
+        ),
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/food/${params.id}?details=true`),
       },
       {
         path: "/foods/manage",
