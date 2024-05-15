@@ -2,20 +2,26 @@ import { Link } from "react-router-dom";
 import FoodCard from "../../../components/FoodCard";
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
+import CardSkeleton from "../../../components/shared/CardSkeleton";
 
 const AvailableFood = () => {
   const [filter, setFiler] = React.useState("0");
+  const axiosSecure = useAxiosSecure();
+
+  const { data: foods, isLoading } = useQuery({
+    queryKey: ["availableFoods"],
+    queryFn: () => axiosSecure.get("/foods/").then((res) => res.data),
+  });
+
   React.useEffect(() => {
     window.addEventListener("load", () => {
       const ft = window.HSSelect.getInstance("#filter");
       ft.on("change", (val) => setFiler(val));
     });
-    // console.log(filter);
+    console.log(filter);
   }, [filter]);
-  const handleFilter = (e) => {
-    console.log("object");
-    setFiler(e.target.value);
-  };
   return (
     <>
       {/* <!-- Card Blog --> */}
@@ -79,7 +85,6 @@ const AvailableFood = () => {
           <select
             id="filter"
             defaultValue={filter}
-            onChange={handleFilter}
             data-hs-select='{
                 "placeholder": "<span class=\"inline-flex items-center\"><svg class=\"flex-shrink-0 size-3.5 me-2\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"/></svg> Filter</span>",
                 "toggleTag": "<button type=\"button\"></button>",
@@ -87,8 +92,7 @@ const AvailableFood = () => {
                 "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
                 "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100",
                 "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
-                "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"flex-shrink-0 size-3.5 text-gray-500 dark:text-neutral-500\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>",
-                "on:change": "handleFilter"
+                "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"flex-shrink-0 size-3.5 text-gray-500 dark:text-neutral-500\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
               }'
             className=""
           >
@@ -102,10 +106,15 @@ const AvailableFood = () => {
 
         {/* <!-- Grid --> */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <FoodCard />
-          <FoodCard />
-          <FoodCard />
-          {/* <CardSkeleton /> */}
+          {isLoading ? (
+            <>
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+            </>
+          ) : (
+            foods.map((food) => <FoodCard key={food._id} food={food} />)
+          )}
         </div>
         {/* <!-- End Grid --> */}
       </div>
