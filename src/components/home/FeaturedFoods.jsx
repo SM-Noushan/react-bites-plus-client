@@ -1,8 +1,16 @@
 import { Link } from "react-router-dom";
 import FoodCard from "../FoodCard";
 import CardSkeleton from "../shared/CardSkeleton";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useQuery } from "@tanstack/react-query";
 
 const FeaturedFoods = () => {
+  const axiosSecure = useAxiosSecure();
+  const { data: foods, isLoading } = useQuery({
+    queryKey: ["featuredFoods"],
+    queryFn: () =>
+      axiosSecure.get("/foods/?featured=true").then((res) => res.data),
+  });
   return (
     <>
       {/* <!-- Card Blog --> */}
@@ -22,10 +30,15 @@ const FeaturedFoods = () => {
 
         {/* <!-- Grid --> */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <FoodCard />
-          <FoodCard />
-          <FoodCard />
-          {/* <CardSkeleton /> */}
+          {isLoading ? (
+            <>
+              <CardSkeleton />
+              <CardSkeleton />
+              <CardSkeleton />
+            </>
+          ) : (
+            foods.map((food) => <FoodCard key={food._id} food={food} />)
+          )}
         </div>
         {/* <!-- End Grid --> */}
 
