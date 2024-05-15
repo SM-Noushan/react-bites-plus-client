@@ -3,6 +3,12 @@ import { Helmet } from "react-helmet-async";
 import AddFood from "../add-food/AddFood";
 import { useLoaderData, useParams } from "react-router-dom";
 import moment from "moment";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useMutation } from "@tanstack/react-query";
+import React from "react";
+import { HSOverlay } from "preline/preline";
+import useAuth from "../../../hooks/useAuth";
+import { toast } from "react-toastify";
 
 const inputFiled = (label, idName, val) => (
   <div>
@@ -24,10 +30,16 @@ const inputFiled = (label, idName, val) => (
 );
 
 const FoodDetails = () => {
+  const myNoteRef = React.useRef(null);
   const food = useLoaderData() || null;
+  const currentDate = moment().format("MM/DD/YYYY");
+  const { user } = useAuth();
+  const [rq, setRQ] = React.useState(false);
   const {
+    donatorEmail,
     foodName,
     foodImage,
+    foodStatus,
     donatorName,
     donatorPhotoURL,
     pickupLocation,
@@ -35,6 +47,38 @@ const FoodDetails = () => {
     expireDate,
   } = food;
   const { id } = useParams() || null;
+  const axiosSecure = useAxiosSecure();
+  const { mutateAsync: requestMutation } = useMutation({
+    mutationFn: (data) => {
+      axiosSecure.put(`food/${id}`, data).then((res) => {
+        if (res.data.modifiedCount) {
+          setRQ(true);
+          toast.success("Food requested");
+          HSOverlay.close("#food-request-modal");
+        }
+      });
+    },
+  });
+
+  React.useEffect(() => {
+    foodStatus === "Requested" && setRQ(true);
+    // console.log(request);
+    if (window.HSStaticMethods) window.HSStaticMethods.autoInit();
+  }, [foodStatus]);
+
+  const handleRequest = async () => {
+    const data = {
+      foodStatus: "Requested",
+      requesterEmail: user?.email,
+      requesterNote: myNoteRef.current.value,
+      requestDate: moment().format("YYYY-MM-DD"),
+    };
+    try {
+      await requestMutation(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <section>
       {/* <!-- Card Blog --> */}
@@ -97,10 +141,11 @@ const FoodDetails = () => {
 
             <div className="mt-5">
               <button
+                disabled={rq}
                 className="inline-flex items-center gap-x-1.5 text-lime-600 decoration-2 font-medium bg-lime-50/70 hover:bg-lime-50 px-3 py-2.5 border-2 border-lime-400 rounded-lg"
                 data-hs-overlay="#food-request-modal"
               >
-                Request Food
+                {rq ? "Already Requested" : "Request Food"}
                 <svg
                   className="flex-shrink-0 size-4 rotate-90"
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,23 +207,28 @@ const FoodDetails = () => {
                     <h3 className="text-lg font-semibold text-gray-800">
                       Food Information
                     </h3>
-                    <AddFood variant={true}>
-                      {inputFiled("Food Id", "foodId", "id1727838919838")}
+                    <AddFood
+                      variant={true}
+                      request={{
+                        foodName,
+                        foodImage,
+                        expireDate,
+                        pickupLocation,
+                      }}
+                    >
+                      {inputFiled("Food Id", "foodId", id)}
                       {inputFiled(
                         "Donator Email",
                         "donatorEmail",
-                        "donator@example.com"
+                        donatorEmail
                       )}
+                      {inputFiled("Donator Name", "donatorName", donatorName)}
                       {inputFiled(
-                        "Donator Name",
-                        "donatorName",
-                        "donator name"
+                        "Requester Email",
+                        "requesterEmail",
+                        user.email
                       )}
-                      {inputFiled(
-                        "Requester Name",
-                        "requesterName",
-                        "requester name"
-                      )}
+                      {inputFiled("Request Date", "requestDate", currentDate)}
                     </AddFood>
                     <form className="px-8 sm:px-13 lg:px-16">
                       <div className="space-y-2">
@@ -190,12 +240,12 @@ const FoodDetails = () => {
                         </label>
 
                         <textarea
+                          ref={myNoteRef}
                           id="requesterNotes"
                           name="requesterNotes"
                           className="py-2 px-3 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                           rows="6"
                           placeholder="Please provide any additional information or notes here..."
-                          //   {...register("requesterNotes")}
                         />
                       </div>
                     </form>
@@ -211,6 +261,8 @@ const FoodDetails = () => {
                   Cancel
                 </button>
                 <button
+                  disabled={rq}
+                  onClick={handleRequest}
                   type="button"
                   className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none"
                 >

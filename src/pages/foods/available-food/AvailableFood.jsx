@@ -8,6 +8,7 @@ import CardSkeleton from "../../../components/shared/CardSkeleton";
 
 const AvailableFood = () => {
   const [filter, setFiler] = React.useState("0");
+  const [search, setSearch] = React.useState(null);
   const axiosSecure = useAxiosSecure();
 
   const { data: foods, isLoading } = useQuery({

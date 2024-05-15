@@ -10,7 +10,7 @@ import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation } from "@tanstack/react-query";
 import { useLoaderData, useParams } from "react-router-dom";
 
-const AddFood = ({ variant = null, children }) => {
+const AddFood = ({ variant = null, children, request = {} }) => {
   const food = useLoaderData();
   const { id } = useParams() || null;
   // console.log(food);
@@ -28,11 +28,15 @@ const AddFood = ({ variant = null, children }) => {
 
   React.useEffect(() => {
     if (food?.foodStatus === "Not Available") setMonitorFoodStatus(false);
+    if (variant)
+      Object.keys(request).forEach((key) => {
+        setValue(key, food[key]);
+      });
     if (variant === false)
       Object.keys(food).forEach((key) => {
         if (key != "_id") setValue(key, food[key]);
       });
-  }, [food, variant, setValue]);
+  }, [food, variant, setValue, request]);
 
   const { mutateAsync: addFoodMutation } = useMutation({
     mutationFn: (data) => {
@@ -67,14 +71,6 @@ const AddFood = ({ variant = null, children }) => {
     } catch (err) {
       toast.error("Error! Try again.");
     }
-    // axiosSecure.post("/food", data).then((res) => {
-    //   console.log(res);
-    //   if (res.data.insertedId) {
-    //     setMonitorFoodStatus("available");
-    //     reset();
-    //     toast.success("Successfully Added");
-    //   } else toast.error("Failed to add. Try again");
-    // });
   };
   return (
     <>
@@ -90,7 +86,18 @@ const AddFood = ({ variant = null, children }) => {
         <form onSubmit={handleSubmit(handleLocalSubmit)}>
           {/* <!-- Card --> */}
           <div className="bg-white rounded-xl shadow">
-            <div className="relative h-40 rounded-t-xl bg-[url('https://preline.co/assets/svg/examples/abstract-bg-1.svg')] bg-no-repeat bg-cover bg-center" />
+            <div
+              className="relative h-40 rounded-t-xl bg-no-repeat bg-cover bg-center"
+              style={
+                variant
+                  ? {
+                      backgroundImage: `url(${request.foodImage})`,
+                    }
+                  : {
+                      backgroundImage: `url('https://preline.co/assets/svg/examples/abstract-bg-1.svg')`,
+                    }
+              }
+            />
 
             <div className="pt-0 p-4 sm:pt-0 sm:p-7">
               {/* <!-- Grid --> */}
@@ -319,6 +326,7 @@ const AddFood = ({ variant = null, children }) => {
 AddFood.propTypes = {
   variant: PropTypes.bool,
   children: PropTypes.node,
+  request: PropTypes.object,
 };
 
 export default AddFood;
