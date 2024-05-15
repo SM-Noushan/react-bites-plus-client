@@ -24,22 +24,20 @@ const FirebaseProvider = ({ children }) => {
 
   React.useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currUser) => {
+      // console.log("user >> ", currUser);
       const logged = { email: currUser?.email || user?.email };
-      console.log("user >> ", currUser);
       setUser(currUser);
       setLoading(false);
       if (currUser) {
-        axiosSecure
-          .post("/signin", logged)
-          .then((res) => console.log("token-setup >>", res.data));
+        axiosSecure.post("http://localhost:5000/signin", logged);
+        // .then((res) => console.log("token-setup >>", res.data));
       } else {
-        axiosSecure
-          .post("/signout", logged)
-          .then((res) => console.log("token-clear >>", res.data));
+        axiosSecure.post("http://localhost:5000/signout", logged);
+        // .then((res) => console.log("token-clear >>", res.data));
       }
     });
     return () => unSubscribe();
-  }, []);
+  }, [axiosSecure, user?.email]);
 
   const createUserWithGoogle = () => {
     setLoading(true);

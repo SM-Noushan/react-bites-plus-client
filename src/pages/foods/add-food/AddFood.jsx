@@ -7,31 +7,53 @@ import { Helmet } from "react-helmet-async";
 import useAuth from "../../../hooks/useAuth";
 import AddFoodErrorMsg from "./AddFoodErrorMsg";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useMutation } from "@tanstack/react-query";
 
 const AddFood = ({ variant = null, children }) => {
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const currentDate = moment().format("YYYY-MM-DD");
-  const [monitorFoodStatus, setMonitorFoodStatus] = React.useState("available");
+  const [monitorFoodStatus, setMonitorFoodStatus] = React.useState(true);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm();
-  const handleLocalSubmit = (data) => {
+
+  const { mutateAsync: addFoodMutation } = useMutation({
+    mutationFn: (data) => {
+      // console.log(data);
+      axiosSecure.post("/food", data).then((res) => {
+        // console.log(res);
+        if (res?.data?.insertedId) {
+          setMonitorFoodStatus("available");
+          reset();
+          toast.success("Successfully Added");
+        } else toast.error("Failed to add. Try again");
+      });
+    },
+  });
+  const handleLocalSubmit = async (data) => {
     data.donatorName = user?.displayName;
     data.donatorEmail = user?.email;
     data.donatorPhotoURL = user?.photoURL;
     data.donatorUID = user?.uid;
-    axiosSecure.post("/food", data).then((res) => {
-      console.log(res);
-      if (res.data.insertedId) {
-        setMonitorFoodStatus("available");
-        reset();
-        toast.success("Successfully Added");
-      } else toast.error("Failed to add. Try again");
-    });
+    data.foodStatus = monitorFoodStatus ? "Available" : "Not Available";
+    console.log(data);
+    try {
+      await addFoodMutation(data);
+    } catch (err) {
+      toast.error("Error! Try again.");
+    }
+    // axiosSecure.post("/food", data).then((res) => {
+    //   console.log(res);
+    //   if (res.data.insertedId) {
+    //     setMonitorFoodStatus("available");
+    //     reset();
+    //     toast.success("Successfully Added");
+    //   } else toast.error("Failed to add. Try again");
+    // });
   };
   return (
     <>
@@ -121,8 +143,8 @@ const AddFood = ({ variant = null, children }) => {
                           id="food-status-checkbox-available"
                           {...register("foodStatus", { required: true })}
                           value="available"
-                          onChange={() => setMonitorFoodStatus("available")}
-                          checked={monitorFoodStatus === "available"}
+                          onChange={() => setMonitorFoodStatus(true)}
+                          checked={monitorFoodStatus}
                         />
                         <span className="text-sm text-gray-500 ms-3">
                           Available
@@ -140,8 +162,8 @@ const AddFood = ({ variant = null, children }) => {
                           id="food-status-checkbox-notAvailable"
                           {...register("foodStatus", { required: true })}
                           value="not available"
-                          onChange={() => setMonitorFoodStatus("not available")}
-                          checked={monitorFoodStatus === "not available"}
+                          onChange={() => setMonitorFoodStatus(false)}
+                          checked={!monitorFoodStatus}
                         />
                         <span className="text-sm text-gray-500 ms-3">
                           Not Available
@@ -196,7 +218,7 @@ const AddFood = ({ variant = null, children }) => {
                         placeholder="Enter food location"
                         className="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                         aria-describedby="foodImage-error"
-                        defaultValue={currentDate}
+                        // defaultValue={currentDate}
                         min={currentDate}
                         readOnly={variant}
                         {...register("expireDate", { required: true })}

@@ -11,24 +11,33 @@ const axiosSecure = axios.create({
 
 const useAxiosSecure = () => {
   const { logOut } = useAuth();
-  //   const navigate = useNavigate();
+//   const navigate = useNavigate();
+
   React.useEffect(() => {
-    axiosSecure.interceptors.response.use(
+    const interceptor = axiosSecure.interceptors.response.use(
       (res) => {
         return res;
       },
       (err) => {
-        console.log("err");
-        if (err.response.status === 401 || err.response.status === 403)
-          logOut().then(() => {
-            console.log("object");
-            toast.error("Error! Please signin again.");
-            // navigate("/");
-            return <Navigate to="/signin" />;
-          });
+        console.log("outside>>", err?.response?.status);
+        if (err?.response?.status == 401 || err?.response?.status === 403) {
+          console.log("log ");
+          logOut()
+            .then(() => {
+              console.log("log out");
+              toast.error("Error! Please signin again.");
+            //   return <Navigate to="/signin" />;
+            })
+            .catch((err) => console.log(err));
+        }
       }
     );
+    // // Cleanup the interceptor on unmount
+    return () => {
+      axiosSecure.interceptors.response.eject(interceptor);
+    };
   }, []);
+
   return axiosSecure;
 };
 

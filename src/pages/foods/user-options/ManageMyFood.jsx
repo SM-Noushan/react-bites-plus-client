@@ -1,8 +1,15 @@
-import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import "animate.css";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { useQuery } from "@tanstack/react-query";
+import "animate.css";
+import useAuth from "../../../hooks/useAuth";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import CardSkeleton from "../../../components/shared/CardSkeleton";
+import moment from "moment";
+import { HSDropdown } from "preline/preline";
+import { FaPencil, FaTrash } from "react-icons/fa6";
 
 const swalWithCustomButtons = Swal.mixin({
   customClass: {
@@ -15,6 +22,13 @@ const swalWithCustomButtons = Swal.mixin({
 });
 
 const ManageMyFood = ({ type }) => {
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const { data: foods, isLoading } = useQuery({
+    queryKey: ["manageMyFoods"],
+    queryFn: () =>
+      axiosSecure.get(`/foods/?email=${user?.email}`).then((res) => res.data),
+  });
   const handleDelete = (id) => {
     swalWithCustomButtons
       .fire({
@@ -61,7 +75,7 @@ const ManageMyFood = ({ type }) => {
   return (
     <>
       {/* <!-- Table Section --> */}
-      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-open-sans">
         <Helmet>
           <title>
             Bites+ | {type === "request" ? "My Food Request" : "Manage My Food"}
@@ -73,7 +87,7 @@ const ManageMyFood = ({ type }) => {
             <div className="p-1.5 min-w-full inline-block align-middle">
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                 {/* <!-- Header --> */}
-                <div className="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200">
+                <div className="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 font-playfair-display">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-800">
                       Manage My Foods
@@ -95,219 +109,176 @@ const ManageMyFood = ({ type }) => {
                 </div>
                 {/* <!-- End Header --> */}
 
-                {/* <!-- Table --> */}
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Sl
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Food
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Notes
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Status
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Quantity
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Pickup
-                          </span>
-                        </div>
-                      </th>
-
-                      <th scope="col" className="px-6 py-3 text-start">
-                        <div className="flex items-center gap-x-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                            Expires At
-                          </span>
-                        </div>
-                      </th>
-                      {type === "manage" && (
+                {isLoading ? (
+                  <CardSkeleton />
+                ) : (
+                  // <!-- Table -->
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 font-playfair-display">
+                      <tr>
                         <th scope="col" className="px-6 py-3 text-start">
                           <div className="flex items-center gap-x-2">
                             <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                              Action
+                              Sl
                             </span>
                           </div>
                         </th>
-                      )}
-                    </tr>
-                  </thead>
 
-                  <tbody className="divide-y divide-gray-200">
-                    <tr>
-                      {/* sl */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="text-sm text-gray-600">1</span>
-                        </div>
-                      </td>
-                      {/* food */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <div className="flex flex-col gap-y-2">
-                            <img
-                              className="inline-block size-16 rounded-md"
-                              src="https://images.unsplash.com/photo-1531927557220-a9e23c1e4794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=300&h=300&q=80"
-                              alt="food-image"
-                            />
-                            <div className="grow">
-                              <span className="text-sm text-gray-600">
-                                Food Name
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Food
+                            </span>
+                          </div>
+                        </th>
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Notes
+                            </span>
+                          </div>
+                        </th>
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Status
+                            </span>
+                          </div>
+                        </th>
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Quantity
+                            </span>
+                          </div>
+                        </th>
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Pickup
+                            </span>
+                          </div>
+                        </th>
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              Expires At
+                            </span>
+                          </div>
+                        </th>
+                        {type === "manage" && (
+                          <th scope="col" className="px-6 py-3 text-start">
+                            <div className="flex items-center gap-x-2">
+                              <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                                Action
                               </span>
                             </div>
-                          </div>
-                        </div>
-                      </td>
-                      {/* notes */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="text-sm text-gray-600">
-                            Streamlab
-                          </span>
-                        </div>
-                      </td>
-                      {/* status */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full">
-                            Available
-                          </span>
-                        </div>
-                      </td>
-                      {/* quantity */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full">
-                            <svg
-                              className="size-2.5"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              fill="currentColor"
-                              viewBox="0 0 16 16"
-                            >
-                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                            </svg>
-                            Successful
-                          </span>
-                        </div>
-                      </td>
-                      {/* pickup */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full">
-                            <svg
-                              className="size-2.5"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              fill="currentColor"
-                              viewBox="0 0 16 16"
-                            >
-                              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                            </svg>
-                            Successful
-                          </span>
-                        </div>
-                      </td>
-                      {/* expires */}
-                      <td className="size-px whitespace-nowrap">
-                        <div className="px-6 py-3">
-                          <span className="text-sm text-gray-600">
-                            28 Dec, 12:12
-                          </span>
-                        </div>
-                      </td>
-                      
-                      {/* action */}
-                      {type === "manage" && (
-                        <td className="size-px whitespace-nowrap">
-                          <div className="px-6 py-1.5">
-                            <div className="hs-dropdown [--placement:bottom-right] relative inline-block">
-                              <button
-                                id="hs-table-dropdown-1"
-                                type="button"
-                                className="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-emerald-600 transition-all text-sm"
-                              >
-                                <svg
-                                  className="flex-shrink-0 size-4"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <circle cx="12" cy="12" r="1" />
-                                  <circle cx="19" cy="12" r="1" />
-                                  <circle cx="5" cy="12" r="1" />
-                                </svg>
-                              </button>
-                              <div
-                                className="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden divide-y divide-gray-200 min-w-40 z-10 bg-white shadow-2xl rounded-lg p-2 mt-2"
-                                aria-labelledby="hs-table-dropdown-1"
-                              >
-                                <div className="py-2 first:pt-0 last:pb-0">
-                                  <Link
-                                    className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2 focus:ring-emerald-500"
-                                    to="#"
-                                  >
-                                    Update
-                                  </Link>
-                                </div>
-                                <div className="py-2 first:pt-0 last:pb-0">
-                                  <button
-                                    className="flex items-center gap-x-3 py-2 px-3 rounded-lg text-sm text-red-600 hover:bg-gray-100 focus:ring-2 focus:ring-emerald-500"
-                                    onClick={handleDelete}
-                                  >
-                                    Delete
-                                  </button>
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+
+                    <tbody className="divide-y divide-gray-200">
+                      {foods.map((food, idx) => (
+                        <tr key={food._id}>
+                          {/* sl */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="text-sm text-gray-600">
+                                {idx + 1}
+                              </span>
+                            </div>
+                          </td>
+                          {/* food */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <div className="flex flex-col gap-y-2">
+                                <img
+                                  className="inline-block size-16 rounded-md"
+                                  src={food.foodImage}
+                                  alt="food-image"
+                                />
+                                <div className="grow">
+                                  <span className="text-sm text-gray-600">
+                                    {food.foodName}
+                                  </span>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  </tbody>
-                </table>
-                {/* <!-- End Table --> */}
+                          </td>
+                          {/* notes */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="text-sm text-gray-600">
+                                {food.additionalNotes}
+                              </span>
+                            </div>
+                          </td>
+                          {/* status */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full capitalize">
+                                {food.foodStatus}
+                              </span>
+                            </div>
+                          </td>
+                          {/* quantity */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="p-2 inline-flex items-center gap-x-1 text-xs font-medium bg-gray-200 rounded-full">
+                                {food.foodQuantity}
+                              </span>
+                            </div>
+                          </td>
+                          {/* pickup */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-slate-100 text-slate-800 rounded-full">
+                                {food.pickupLocation}
+                              </span>
+                            </div>
+                          </td>
+                          {/* expires */}
+                          <td className="size-px whitespace-nowrap">
+                            <div className="px-6 py-3">
+                              <span className="text-sm text-gray-600">
+                                {moment(food.expireDate, "YYYY-MM-DD").format(
+                                  "Do MMM, YYYY"
+                                )}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* action */}
+                          {type === "manage" && (
+                            <td className="size-px whitespace-nowrap">
+                              <div className="px-6 py-1.5 flex gap-2">
+                                <button
+                                  type="button"
+                                  className="flex flex-shrink-0 justify-center items-center gap-2 size-[38px] text-sm font-semibold rounded-lg border border-transparent bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                  <FaPencil />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="flex flex-shrink-0 justify-center items-center gap-2 size-[38px] text-sm font-semibold rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  // <!-- End Table -->
+                )}
 
                 {/* <!-- Footer --> */}
                 {/* <div className="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200">

@@ -8,7 +8,7 @@ const PrivateRoutes = ({ children }) => {
   const location = useLocation();
   if (loading) return <Spinner />;
   if (user) return children;
-  return <Navigate state={location.pathname} to="/login"></Navigate>;
+  return <Navigate state={location.pathname} to="/signin"></Navigate>;
 };
 
 PrivateRoutes.propTypes = {
