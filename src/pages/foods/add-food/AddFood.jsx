@@ -8,8 +8,12 @@ import useAuth from "../../../hooks/useAuth";
 import AddFoodErrorMsg from "./AddFoodErrorMsg";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation } from "@tanstack/react-query";
+import { useLoaderData, useParams } from "react-router-dom";
 
 const AddFood = ({ variant = null, children }) => {
+  const food = useLoaderData();
+  const { id } = useParams() || null;
+  // console.log(food);
   const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const currentDate = moment().format("YYYY-MM-DD");
@@ -19,28 +23,46 @@ const AddFood = ({ variant = null, children }) => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm();
+
+  React.useEffect(() => {
+    if (food?.foodStatus === "Not Available") setMonitorFoodStatus(false);
+    if (variant === false)
+      Object.keys(food).forEach((key) => {
+        if (key != "_id") setValue(key, food[key]);
+      });
+  }, [food, variant, setValue]);
 
   const { mutateAsync: addFoodMutation } = useMutation({
     mutationFn: (data) => {
       // console.log(data);
-      axiosSecure.post("/food", data).then((res) => {
-        if (res?.data?.insertedId) {
-          setMonitorFoodStatus("available");
-          reset();
-          toast.success("Successfully Added");
-        } else toast.error("Failed to add. Try again");
-      });
+      variant === null
+        ? axiosSecure.post("/food", data).then((res) => {
+            if (res?.data?.insertedId) {
+              setMonitorFoodStatus(true);
+              reset();
+              toast.success("Successfully Added");
+            } else toast.error("Failed to add. Try again");
+          })
+        : axiosSecure.put(`/food/${id}`, data).then((res) => {
+            if (res?.data?.modifiedCount) {
+              toast.success("Successfully Updated");
+            } else toast.error("Failed to update. Try again");
+          });
     },
   });
   const handleLocalSubmit = async (data) => {
-    data.donatorName = user?.displayName;
-    data.donatorEmail = user?.email;
-    data.donatorPhotoURL = user?.photoURL;
-    data.donatorUID = user?.uid;
-    data.foodStatus = monitorFoodStatus ? "Available" : "Not Available";
-    console.log(data);
+    if (variant === null) {
+      data.donatorName = user?.displayName;
+      data.donatorEmail = user?.email;
+      data.donatorPhotoURL = user?.photoURL;
+      data.donatorUID = user?.uid;
+      data.foodStatus = monitorFoodStatus ? "Available" : "Not Available";
+    }
+    // console.log(data);
     try {
+      // console.log(data);
       await addFoodMutation(data);
     } catch (err) {
       toast.error("Error! Try again.");
@@ -58,11 +80,13 @@ const AddFood = ({ variant = null, children }) => {
     <>
       {/* <!-- Card Section --> */}
       <div className="max-w-4xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-open-sans">
-        {variant === null && (
-          <Helmet>
+        <Helmet>
+          {variant === null ? (
             <title>Bites+ | Add Food</title>
-          </Helmet>
-        )}
+          ) : (
+            variant === false && <title>Bites+ | Update Food</title>
+          )}
+        </Helmet>
         <form onSubmit={handleSubmit(handleLocalSubmit)}>
           {/* <!-- Card --> */}
           <div className="bg-white rounded-xl shadow">
@@ -87,7 +111,6 @@ const AddFood = ({ variant = null, children }) => {
                       {...register("foodName", {
                         required: true,
                       })}
-                      defaultValue={"default value"}
                       readOnly={variant}
                     />
                   </div>
@@ -141,7 +164,7 @@ const AddFood = ({ variant = null, children }) => {
                           className="shrink-0 mt-0.5 border-gray-300 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                           id="food-status-checkbox-available"
                           {...register("foodStatus", { required: true })}
-                          value="available"
+                          value="Available"
                           onChange={() => setMonitorFoodStatus(true)}
                           checked={monitorFoodStatus}
                         />
@@ -160,7 +183,7 @@ const AddFood = ({ variant = null, children }) => {
                           className="shrink-0 mt-0.5 border-gray-300 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
                           id="food-status-checkbox-notAvailable"
                           {...register("foodStatus", { required: true })}
-                          value="not available"
+                          value="Not Available"
                           onChange={() => setMonitorFoodStatus(false)}
                           checked={!monitorFoodStatus}
                         />
@@ -279,7 +302,7 @@ const AddFood = ({ variant = null, children }) => {
               {!variant && (
                 <div className="mt-5 flex justify-center gap-x-2">
                   <button className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none">
-                    Add Food Item
+                    {variant === false ? "Update" : "Add"} Food Item
                   </button>
                 </div>
               )}

@@ -53,6 +53,16 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/food/update/:id",
+        element: (
+          <PrivateRoutes>
+            <AddFood variant={false} />
+          </PrivateRoutes>
+        ),
+        loader: ({ params }) =>
+          fetch(`http://localhost:5000/food/${params.id}`),
+      },
+      {
         path: "/foods/request",
         element: <ManageMyFood type="request" />,
       },

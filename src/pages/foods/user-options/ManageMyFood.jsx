@@ -226,7 +226,7 @@ const ManageMyFood = ({ type }) => {
                             </div>
                           </td>
                           {/* notes */}
-                          <td className="size-px whitespace-nowrap">
+                          <td className="size-px min-w-56">
                             <div className="px-6 py-3">
                               <span className="text-sm text-gray-600">
                                 {food.additionalNotes}
@@ -236,7 +236,15 @@ const ManageMyFood = ({ type }) => {
                           {/* status */}
                           <td className="size-px whitespace-nowrap">
                             <div className="px-6 py-3">
-                              <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full capitalize">
+                              <span
+                                className={`py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium rounded-full capitalize ${
+                                  food.foodStatus === "Available"
+                                    ? "bg-teal-100 text-teal-800"
+                                    : food.foodStatus === "Not Available"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}
+                              >
                                 {food.foodStatus}
                               </span>
                             </div>
@@ -250,7 +258,7 @@ const ManageMyFood = ({ type }) => {
                             </div>
                           </td>
                           {/* pickup */}
-                          <td className="size-px whitespace-nowrap">
+                          <td className="size-px min-w-44">
                             <div className="px-6 py-3">
                               <span className="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-slate-100 text-slate-800 rounded-full">
                                 {food.pickupLocation}
@@ -272,12 +280,12 @@ const ManageMyFood = ({ type }) => {
                           {type === "manage" && (
                             <td className="size-px whitespace-nowrap">
                               <div className="px-6 py-1.5 flex gap-2">
-                                <button
-                                  type="button"
+                                <Link
+                                  to={`/food/update/${food._id}`}
                                   className="flex flex-shrink-0 justify-center items-center gap-2 size-[38px] text-sm font-semibold rounded-lg border border-transparent bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:pointer-events-none"
                                 >
                                   <FaPencil />
-                                </button>
+                                </Link>
                                 <button
                                   onClick={() => handleDelete(food._id)}
                                   type="button"

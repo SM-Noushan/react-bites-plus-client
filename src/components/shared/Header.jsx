@@ -212,6 +212,7 @@ const Header = () => {
                         ? `ring-2 ring-lime-400 ${dropdownItemsCSS}`
                         : dropdownItemsCSS
                     }
+                    end
                   >
                     Add Food
                   </NavLink>
