@@ -8,13 +8,21 @@ import CardSkeleton from "../../../components/shared/CardSkeleton";
 
 const AvailableFood = () => {
   const [filter, setFiler] = React.useState("0");
-  const [search, setSearch] = React.useState(null);
+  const [search, setSearch] = React.useState("");
   const [layout, setLayout] = React.useState(true);
+  const searchRef = React.useRef("");
   const axiosSecure = useAxiosSecure();
 
-  const { data: foods, isLoading } = useQuery({
-    queryKey: ["availableFoods"],
-    queryFn: () => axiosSecure.get("/foods/").then((res) => res.data),
+  const {
+    data: foods,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["availableFoods", { search, filter }],
+    queryFn: () =>
+      axiosSecure
+        .get(`/foods/?search=${search}&filter=${filter}`)
+        .then((res) => res.data),
   });
 
   React.useEffect(() => {
@@ -24,6 +32,10 @@ const AvailableFood = () => {
     });
     // console.log(filter);
   }, [filter]);
+  const handleSearch = () => {
+    setSearch(searchRef.current.value);
+  };
+
   return (
     <>
       {/* <!-- Card Blog --> */}
@@ -66,15 +78,16 @@ const AvailableFood = () => {
                 </svg>
               </div>
               <input
+                ref={searchRef}
                 className="py-3 ps-10 pe-4 block w-full border border-gray-200 rounded-lg text-sm disabled:opacity-50 disabled:pointer-events-none"
                 type="text"
                 placeholder="Search"
-                defaultValue=""
+                defaultValue={search}
               />
             </div>
             <button
+              onClick={handleSearch}
               className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none"
-              to="/foods"
             >
               Search
             </button>
@@ -110,7 +123,6 @@ const AvailableFood = () => {
             <button
               onClick={() => setLayout(!layout)}
               className="hidden lg:inline-flex py-3 px-4 items-center text-sm font-semibold rounded-lg border border-transparent bg-lime-600 text-white hover:bg-lime-700 disabled:opacity-50 disabled:pointer-events-none"
-              to="/foods"
             >
               Change Layouts
             </button>
@@ -118,7 +130,11 @@ const AvailableFood = () => {
         </div>
 
         {/* <!-- Grid --> */}
-        <div className={`grid sm:grid-cols-2 lg:${layout ? "grid-cols-3" : "grid-cols-2"} gap-6`}>
+        <div
+          className={`grid sm:grid-cols-2 lg:${
+            layout ? "grid-cols-3" : "grid-cols-2"
+          } gap-6`}
+        >
           {isLoading ? (
             <>
               <CardSkeleton />
