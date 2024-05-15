@@ -25,7 +25,6 @@ const AddFood = ({ variant = null, children }) => {
     mutationFn: (data) => {
       // console.log(data);
       axiosSecure.post("/food", data).then((res) => {
-        // console.log(res);
         if (res?.data?.insertedId) {
           setMonitorFoodStatus("available");
           reset();

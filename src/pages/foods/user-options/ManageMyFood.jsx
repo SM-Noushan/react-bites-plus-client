@@ -1,15 +1,14 @@
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import moment from "moment";
 import { Helmet } from "react-helmet-async";
-import { useQuery } from "@tanstack/react-query";
-import "animate.css";
+import { FaPencil, FaTrash } from "react-icons/fa6";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import CardSkeleton from "../../../components/shared/CardSkeleton";
-import moment from "moment";
-import { HSDropdown } from "preline/preline";
-import { FaPencil, FaTrash } from "react-icons/fa6";
+import "animate.css";
 
 const swalWithCustomButtons = Swal.mixin({
   customClass: {
@@ -22,12 +21,33 @@ const swalWithCustomButtons = Swal.mixin({
 });
 
 const ManageMyFood = ({ type }) => {
-  const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
   const { data: foods, isLoading } = useQuery({
     queryKey: ["manageMyFoods"],
     queryFn: () =>
       axiosSecure.get(`/foods/?email=${user?.email}`).then((res) => res.data),
+  });
+
+  const { mutateAsync: deleteFoodMutation } = useMutation({
+    mutationFn: (id) => {
+      axiosSecure.delete(`food/${id}`).then((res) => {
+        if (res?.data?.deletedCount) {
+          queryClient.invalidateQueries(["manageMyFoods"]);
+          Swal.fire({
+            title: "Removed!",
+            text: "Food Item Removed",
+            icon: "success",
+          });
+        }
+      });
+    },
+    // onSuccess: () => {
+    //   console.log("onSuccess"); //it triggers on every deletion
+    //   queryClient.invalidateQueries(["manageMyFoods"]); //it triggers only the first time
+    // },
   });
   const handleDelete = (id) => {
     swalWithCustomButtons
@@ -52,24 +72,18 @@ const ManageMyFood = ({ type }) => {
             `,
         },
       })
-      .then((result) => {
-        if (result.isConfirmed) console.log("delted");
-        //   client("delete", `/painting-and-drawing/${id}`).then((res) => {
-        //     if (res?.data?.deletedCount) {
-        //       refetch();
-        //       Swal.fire({
-        //         title: "Deleted!",
-        //         text: "Craft and Art deleted",
-        //         icon: "success",
-        //       });
-        //     }
-        else
-          Swal.fire({
-            title: "Failed!",
-            text: "Something went wrong",
-            icon: "error",
-          });
-        //   });
+      .then(async (result) => {
+        try {
+          if (result.isConfirmed) await deleteFoodMutation(id);
+          else
+            Swal.fire({
+              title: "Cancelled!",
+              text: "Cancelled delete request",
+              icon: "error",
+            });
+        } catch (e) {
+          console.log(e);
+        }
       });
   };
   return (
@@ -265,6 +279,7 @@ const ManageMyFood = ({ type }) => {
                                   <FaPencil />
                                 </button>
                                 <button
+                                  onClick={() => handleDelete(food._id)}
                                   type="button"
                                   className="flex flex-shrink-0 justify-center items-center gap-2 size-[38px] text-sm font-semibold rounded-lg border border-transparent bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:pointer-events-none"
                                 >
