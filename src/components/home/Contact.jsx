@@ -1,5 +1,6 @@
-import React from "react";
-
+// import lottie from "lottie-web";
+import Lottie from "lottie-react";
+import shareFood from "../../assets/share-food.json";
 const Contact = () => {
   return (
     <>
@@ -13,11 +14,12 @@ const Contact = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:items-center gap-6 md:gap-8 lg:gap-12">
           <div className="aspect-w-16 aspect-h-6 lg:aspect-h-14 overflow-hidden bg-gray-100 rounded-2xl">
-            <img
+            <Lottie animationData={shareFood} className="w-96 mx-auto" />;
+            {/* <img
               className="group-hover:scale-105 transition-transform duration-500 ease-in-out object-cover rounded-2xl max-h-[394px] w-full object-center"
               src="https://images.unsplash.com/photo-1585909694668-0a6e0ddbfe8b?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               alt="Image Description"
-            />
+            /> */}
           </div>
           {/* <!-- End Col --> */}
 

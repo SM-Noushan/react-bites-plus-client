@@ -16,7 +16,6 @@ const AvailableFood = () => {
   const {
     data: foods,
     isLoading,
-    refetch,
   } = useQuery({
     queryKey: ["availableFoods", { search, filter }],
     queryFn: () =>
