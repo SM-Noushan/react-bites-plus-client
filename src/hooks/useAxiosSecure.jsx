@@ -21,14 +21,14 @@ const useAxiosSecure = () => {
       (err) => {
         console.log("outside>>", err?.response?.status);
         if (err?.response?.status == 401 || err?.response?.status === 403) {
-          console.log("log ");
-          logOut()
-            .then(() => {
-              console.log("log out");
-              toast.error("Error! Please signin again.");
-            //   return <Navigate to="/signin" />;
-            })
-            .catch((err) => console.log(err));
+          console.log("Forbidden LOG ");
+          // logOut()
+          //   .then(() => {
+          //     console.log("log out");
+          //     toast.error("Error! Please signin again.");
+          //   //   return <Navigate to="/signin" />;
+          //   })
+          //   .catch((err) => console.log(err));
         }
       }
     );

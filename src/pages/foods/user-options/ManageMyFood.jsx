@@ -27,8 +27,13 @@ const ManageMyFood = ({ type }) => {
 
   const { data: foods, isLoading } = useQuery({
     queryKey: ["manageMyFoods"],
-    queryFn: () =>
-      axiosSecure.get(`/foods/?email=${user?.email}`).then((res) => res.data),
+    queryFn: () => {
+      const path =
+        type === "manage"
+          ? `/foods/?email=${user?.email}`
+          : `/foods/?email=${user?.email}&request=true`;
+      return axiosSecure.get(path).then((res) => res.data);
+    },
   });
 
   const { mutateAsync: deleteFoodMutation } = useMutation({
@@ -153,14 +158,25 @@ const ManageMyFood = ({ type }) => {
                             </span>
                           </div>
                         </th>
+                        {type === "manage" && (
+                          <th scope="col" className="px-6 py-3 text-start">
+                            <div className="flex items-center gap-x-2">
+                              <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                                Status
+                              </span>
+                            </div>
+                          </th>
+                        )}
 
-                        <th scope="col" className="px-6 py-3 text-start">
-                          <div className="flex items-center gap-x-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                              Status
-                            </span>
-                          </div>
-                        </th>
+                        {type === "request" && (
+                          <th scope="col" className="px-6 py-3 text-start">
+                            <div className="flex items-center gap-x-2">
+                              <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                                Donor
+                              </span>
+                            </div>
+                          </th>
+                        )}
 
                         <th scope="col" className="px-6 py-3 text-start">
                           <div className="flex items-center gap-x-2">
@@ -185,15 +201,14 @@ const ManageMyFood = ({ type }) => {
                             </span>
                           </div>
                         </th>
-                        {type === "manage" && (
-                          <th scope="col" className="px-6 py-3 text-start">
-                            <div className="flex items-center gap-x-2">
-                              <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                                Action
-                              </span>
-                            </div>
-                          </th>
-                        )}
+
+                        <th scope="col" className="px-6 py-3 text-start">
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
+                              {type === "request" ? "Request At" : "Action"}
+                            </span>
+                          </div>
+                        </th>
                       </tr>
                     </thead>
 
@@ -230,6 +245,11 @@ const ManageMyFood = ({ type }) => {
                             <div className="px-6 py-3">
                               <span className="text-sm text-gray-600">
                                 {food.additionalNotes}
+                                <br />
+                                <span className="text-xs">
+                                  {type === "request" &&
+                                    `Request Note: ${food.requesterNote}`}
+                                </span>
                               </span>
                             </div>
                           </td>
@@ -245,7 +265,9 @@ const ManageMyFood = ({ type }) => {
                                     : "bg-yellow-100 text-yellow-800"
                                 }`}
                               >
-                                {food.foodStatus}
+                                {type === "manage"
+                                  ? food.foodStatus
+                                  : food.donatorName}
                               </span>
                             </div>
                           </td>
@@ -275,6 +297,18 @@ const ManageMyFood = ({ type }) => {
                               </span>
                             </div>
                           </td>
+                          {type === "request" && (
+                            <td className="size-px whitespace-nowrap">
+                              <div className="px-6 py-3">
+                                <span className="text-sm text-gray-600">
+                                  {moment(
+                                    food.requestDate,
+                                    "YYYY-MM-DD"
+                                  ).format("Do MMM, YYYY")}
+                                </span>
+                              </div>
+                            </td>
+                          )}
 
                           {/* action */}
                           {type === "manage" && (

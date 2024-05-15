@@ -21,7 +21,7 @@ const AvailableFood = () => {
       const ft = window.HSSelect.getInstance("#filter");
       ft.on("change", (val) => setFiler(val));
     });
-    console.log(filter);
+    // console.log(filter);
   }, [filter]);
   return (
     <>

@@ -27,7 +27,6 @@ const AddFood = ({ variant = null, children, request = {} }) => {
   } = useForm();
 
   React.useEffect(() => {
-    if (food?.foodStatus === "Not Available") setMonitorFoodStatus(false);
     if (variant)
       Object.keys(request).forEach((key) => {
         setValue(key, food[key]);
@@ -47,13 +46,26 @@ const AddFood = ({ variant = null, children, request = {} }) => {
               setMonitorFoodStatus(true);
               reset();
               toast.success("Successfully Added");
-            } else toast.error("Failed to add. Try again");
+            } else {
+              if (data?.foodStatus === "Not Available")
+                setMonitorFoodStatus(false);
+              toast.error("Failed to add. Try again");
+            }
           })
-        : axiosSecure.put(`/food/${id}`, data).then((res) => {
-            if (res?.data?.modifiedCount) {
-              toast.success("Successfully Updated");
-            } else toast.error("Failed to update. Try again");
-          });
+        : axiosSecure
+            .put(`/food/${id}`, data)
+            .then((res) => {
+              if (res?.data?.modifiedCount) {
+                setValue("foodStatus", data.foodStatus);
+                toast.success("Successfully Updated");
+              } else {
+                if (data?.foodStatus === "Not Available") {
+                  setValue("foodStatus", data.foodStatus);
+                  toast.error("Modify to update");
+                }
+              }
+            })
+            .catch((e) => console.log("object", e));
     },
   });
   const handleLocalSubmit = async (data) => {
@@ -69,6 +81,7 @@ const AddFood = ({ variant = null, children, request = {} }) => {
       // console.log(data);
       await addFoodMutation(data);
     } catch (err) {
+      setValue("foodStatus", data.foodStatus);
       toast.error("Error! Try again.");
     }
   };
