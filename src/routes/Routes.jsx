@@ -70,7 +70,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/foods/request",
-        element: <ManageMyFood type="request" />,
+        element: (
+          <PrivateRoutes>
+            <ManageMyFood type="request" />
+          </PrivateRoutes>
+        ),
       },
     ],
   },

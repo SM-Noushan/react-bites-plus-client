@@ -24,7 +24,7 @@ const ManageMyFood = ({ type }) => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-
+  
   const { data: foods, isLoading } = useQuery({
     queryKey: ["manageMyFoods"],
     queryFn: () => {
