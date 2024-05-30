@@ -5,7 +5,7 @@ const Contact = () => {
   return (
     <>
       {/* <!-- Contact --> */}
-      <div className="max-w-7xl px-4 lg:px-6 lg:px-8 py-12 lg:py-24 mx-auto">
+      <div className="max-w-7xl px-4 lg:px-8 py-12 lg:py-24 mx-auto">
         <div className="mb-6 sm:mb-10 max-w-2xl text-center mx-auto">
           <h2 className="font-medium text-black text-2xl sm:text-4xl">
             Contacts
@@ -47,11 +47,11 @@ const Contact = () => {
                   </svg>
 
                   <div className="grow">
-                    <p className="text-sm text-gray-600">United Kingdom</p>
+                    <p className="text-sm text-gray-600">Bangladesh</p>
                     <address className="mt-1 text-black not-italic">
-                      300 Bath Street, Tay House
+                      625 @ Neo Blake Road,
                       <br />
-                      Glasgow G2 4JR
+                      Artland, Craft 14536,
                     </address>
                   </div>
                 </div>

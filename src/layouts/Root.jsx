@@ -5,6 +5,7 @@ import Header from "../components/shared/Header";
 import Footer from "../components/shared/Footer";
 import ScrollToTop from "../components/shared/ScrollToTop";
 import "preline/preline";
+import GoToTop from "../components/shared/GoToTop";
 
 const Root = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const Root = () => {
 
   return (
     <section className="bg-gray-100">
+      <GoToTop />
       <ScrollToTop />
       <Header />
       <Outlet />
