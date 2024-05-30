@@ -3,12 +3,13 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { Helmet } from "react-helmet-async";
-import { FaPencil, FaTrash } from "react-icons/fa6";
+import { FaCircleXmark, FaPencil, FaTrash } from "react-icons/fa6";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import CardSkeleton from "../../../components/shared/CardSkeleton";
 import "animate.css";
+import axios from "axios";
 
 const swalWithCustomButtons = Swal.mixin({
   customClass: {
@@ -26,7 +27,7 @@ const ManageMyFood = ({ type }) => {
   const { user } = useAuth();
 
   const { data: foods, isLoading } = useQuery({
-    queryKey: ["manageMyFoods", [type]],
+    queryKey: [type === "manage" ? "manageMyFoods" : "requestedFood"],
     queryFn: () => {
       const path =
         type === "manage"
@@ -49,11 +50,24 @@ const ManageMyFood = ({ type }) => {
         }
       });
     },
-    // onSuccess: () => {
-    //   console.log("onSuccess"); //it triggers on every deletion
-    //   queryClient.invalidateQueries(["manageMyFoods"]); //it triggers only the first time
-    // },
   });
+
+  const { mutateAsync: CancelRequestMutation } = useMutation({
+    mutationFn: (id) => {
+      axiosSecure.patch(`food/${id}`).then((res) => {
+        console.log(res.data);
+        if (res?.data?.modifiedCount) {
+          queryClient.invalidateQueries(["requestedFood"]);
+          Swal.fire({
+            title: "Cancelled!",
+            text: "Food Request Cancelled",
+            icon: "success",
+          });
+        }
+      });
+    },
+  });
+
   const handleDelete = (id) => {
     swalWithCustomButtons
       .fire({
@@ -91,6 +105,38 @@ const ManageMyFood = ({ type }) => {
         }
       });
   };
+
+  const handleCancelRequest = (id) => {
+    swalWithCustomButtons
+      .fire({
+        title: "Cancel Request?",
+        text: "Are you sure that you want to cancel it?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Proceed",
+        showClass: {
+          popup: `
+              animate__animated
+              animate__fadeInUp
+              animate__faster
+            `,
+        },
+        hideClass: {
+          popup: `
+              animate__animated
+              animate__fadeOutDown
+              animate__faster
+            `,
+        },
+      })
+      .then(async (result) => {
+        try {
+          if (result.isConfirmed) await CancelRequestMutation(id);
+        } catch (e) {
+          // console.log(e);
+        }
+      });
+  };
   return (
     <>
       {/* <!-- Table Section --> */}
@@ -113,18 +159,6 @@ const ManageMyFood = ({ type }) => {
                     </h2>
                     <p className="text-sm text-gray-600">Update or Remove</p>
                   </div>
-
-                  {/* view all */}
-                  {/* <div>
-                    <div className="inline-flex gap-x-2">
-                      <a
-                        className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
-                        href="#"
-                      >
-                        View all
-                      </a>
-                    </div>
-                  </div> */}
                 </div>
                 {/* <!-- End Header --> */}
 
@@ -145,7 +179,7 @@ const ManageMyFood = ({ type }) => {
                         <th scope="col" className="px-6 py-3 text-start">
                           <div className="flex items-center gap-x-2">
                             <span className="text-xs font-semibold uppercase tracking-wide text-gray-800">
-                              Sl
+                              {type === "request" || "SL"}
                             </span>
                           </div>
                         </th>
@@ -225,9 +259,19 @@ const ManageMyFood = ({ type }) => {
                           {/* sl */}
                           <td className="size-px whitespace-nowrap">
                             <div className="px-6 py-3">
-                              <span className="text-sm text-gray-600">
-                                {idx + 1}
-                              </span>
+                              {type === "manage" ? (
+                                <span className="text-sm text-gray-600">
+                                  {idx + 1}
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleCancelRequest(food._id)}
+                                  type="button"
+                                  className="flex flex-shrink-0 justify-center items-center size-[38px] rounded-full text-xl font-semibold border border-transparent bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:pointer-events-none"
+                                >
+                                  <FaCircleXmark />
+                                </button>
+                              )}
                             </div>
                           </td>
                           {/* food */}
