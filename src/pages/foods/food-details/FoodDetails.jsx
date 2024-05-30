@@ -73,10 +73,12 @@ const FoodDetails = () => {
       requesterNote: myNoteRef.current.value,
       requestDate: moment().format("YYYY-MM-DD"),
     };
+    if (user?.email == donatorEmail)
+      return toast.warn("!!!You can't request you own food");
     try {
       await requestMutation(data);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      // console.log(err);
     }
   };
   return (

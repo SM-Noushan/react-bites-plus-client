@@ -4,11 +4,11 @@ import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
-import useAuth from "../../../hooks/useAuth";
-import AddFoodErrorMsg from "./AddFoodErrorMsg";
-import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useMutation } from "@tanstack/react-query";
 import { useLoaderData, useParams } from "react-router-dom";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import AddFoodErrorMsg from "./AddFoodErrorMsg";
+import useAuth from "../../../hooks/useAuth";
 
 const AddFood = ({ variant = null, children, request = {} }) => {
   const food = useLoaderData();
@@ -31,11 +31,12 @@ const AddFood = ({ variant = null, children, request = {} }) => {
       Object.keys(request).forEach((key) => {
         setValue(key, food[key]);
       });
+
     if (variant === false)
       Object.keys(food).forEach((key) => {
         if (key != "_id") setValue(key, food[key]);
       });
-  }, [food, variant, setValue, request]);
+  }, []);
 
   const { mutateAsync: addFoodMutation } = useMutation({
     mutationFn: (data) => {
@@ -65,7 +66,9 @@ const AddFood = ({ variant = null, children, request = {} }) => {
                 }
               }
             })
-            .catch((e) => console.log("object", e));
+            .catch(() => {
+              // console.log("object", e)
+            });
     },
   });
   const handleLocalSubmit = async (data) => {

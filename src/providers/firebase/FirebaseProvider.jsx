@@ -29,10 +29,13 @@ const FirebaseProvider = ({ children }) => {
       setUser(currUser);
       setLoading(false);
       if (currUser) {
-        axiosSecure.post("http://localhost:5000/signin", logged);
+        axiosSecure.post("https://bites-plus-server.vercel.app/signin", logged);
         // .then((res) => console.log("token-setup >>", res.data));
       } else {
-        axiosSecure.post("http://localhost:5000/signout", logged);
+        axiosSecure.post(
+          "https://bites-plus-server.vercel.app/signout",
+          logged
+        );
         // .then((res) => console.log("token-clear >>", res.data));
       }
     });

@@ -24,9 +24,9 @@ const ManageMyFood = ({ type }) => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  
+
   const { data: foods, isLoading } = useQuery({
-    queryKey: ["manageMyFoods"],
+    queryKey: ["manageMyFoods", [type]],
     queryFn: () => {
       const path =
         type === "manage"
@@ -87,14 +87,14 @@ const ManageMyFood = ({ type }) => {
               icon: "error",
             });
         } catch (e) {
-          console.log(e);
+          // console.log(e);
         }
       });
   };
   return (
     <>
       {/* <!-- Table Section --> */}
-      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-open-sans">
+      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto font-open-sans min-h-52 lg:min-h-[calc(100dvh-488px)]">
         <Helmet>
           <title>
             Bites+ | {type === "request" ? "My Food Request" : "Manage My Food"}
@@ -130,8 +130,15 @@ const ManageMyFood = ({ type }) => {
 
                 {isLoading ? (
                   <CardSkeleton />
+                ) : foods.length === 0 ? (
+                  <div
+                    className="mt-2 bg-amber-300 text-s text-white px-4 py-8 text-center"
+                    role="alert"
+                  >
+                    <span className="font-bold">Info:</span> No Data Found
+                  </div>
                 ) : (
-                  // <!-- Table -->
+                  //  <!-- Table -->
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50 font-playfair-display">
                       <tr>

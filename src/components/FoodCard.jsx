@@ -24,7 +24,7 @@ const FoodCard = ({ food }) => {
     <div className="group flex flex-col h-full border border-gray-200 hover:border-transparent hover:shadow-lg transition-all duration-300 rounded-xl p-5">
       <div className="aspect-w-16 aspect-h-11 overflow-hidden rounded-xl">
         <img
-          className="w-full object-cover rounded-xl hover:scale-125 hover:brightness-75 duration-1000 transition"
+          className="w-full h-64 object-cover object-center rounded-xl hover:scale-125 hover:brightness-75 duration-1000 transition"
           src={foodImage}
           alt="food-image"
         />

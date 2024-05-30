@@ -48,7 +48,9 @@ export const router = createBrowserRouter([
           </PrivateRoutes>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:5000/food/${params.id}?details=true`),
+          fetch(
+            `https://bites-plus-server.vercel.app/food/${params.id}?details=true`
+          ),
       },
       {
         path: "/foods/manage",
@@ -66,7 +68,7 @@ export const router = createBrowserRouter([
           </PrivateRoutes>
         ),
         loader: ({ params }) =>
-          fetch(`http://localhost:5000/food/${params.id}`),
+          fetch(`https://bites-plus-server.vercel.app/food/${params.id}`),
       },
       {
         path: "/foods/request",

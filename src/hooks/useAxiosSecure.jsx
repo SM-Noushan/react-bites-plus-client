@@ -5,13 +5,13 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://bites-plus-server.vercel.app",
   withCredentials: true,
 });
 
 const useAxiosSecure = () => {
   const { logOut } = useAuth();
-//   const navigate = useNavigate();
+  //   const navigate = useNavigate();
 
   React.useEffect(() => {
     const interceptor = axiosSecure.interceptors.response.use(
@@ -19,9 +19,9 @@ const useAxiosSecure = () => {
         return res;
       },
       (err) => {
-        console.log("outside>>", err?.response?.status);
+        // console.log("outside>>", err?.response?.status);
         if (err?.response?.status == 401 || err?.response?.status === 403) {
-          console.log("Forbidden LOG ");
+          // console.log("Forbidden LOG ");
           // logOut()
           //   .then(() => {
           //     console.log("log out");

@@ -46,7 +46,6 @@ const Signin = () => {
       .then(() => {
         setCredentialError(false);
         toast.success("Signin successful");
-        if (location.state) console.log(location?.state);
         navigate(location.state ? location.state : "/");
       })
       .catch(() => {

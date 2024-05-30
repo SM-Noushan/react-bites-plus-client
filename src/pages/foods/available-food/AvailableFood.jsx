@@ -7,16 +7,13 @@ import { useQuery } from "@tanstack/react-query";
 import CardSkeleton from "../../../components/shared/CardSkeleton";
 
 const AvailableFood = () => {
-  const [filter, setFiler] = React.useState("0");
+  const [filter, setFiler] = React.useState(0);
   const [search, setSearch] = React.useState("");
   const [layout, setLayout] = React.useState(true);
   const searchRef = React.useRef("");
   const axiosSecure = useAxiosSecure();
 
-  const {
-    data: foods,
-    isLoading,
-  } = useQuery({
+  const { data: foods, isLoading } = useQuery({
     queryKey: ["availableFoods", { search, filter }],
     queryFn: () =>
       axiosSecure
@@ -25,12 +22,17 @@ const AvailableFood = () => {
   });
 
   React.useEffect(() => {
-    window.addEventListener("load", () => {
-      const ft = window.HSSelect.getInstance("#filter");
-      ft.on("change", (val) => setFiler(val));
-    });
+    // console.log("aaaaaa>>");
+    // window.addEventListener("load", () => {
+    //   const ft = window.HSSelect.getInstance("#filter");
+    //   console.log("XXX>>");
+    //   ft.on("change", (val) => {
+    //     console.log("val>>", val);
+    //     setFiler(val);
+    //   });
+    // });
     // console.log(filter);
-  }, [filter]);
+  }, []);
   const handleSearch = () => {
     setSearch(searchRef.current.value);
   };
@@ -96,27 +98,103 @@ const AvailableFood = () => {
 
         <div className="flex items-center justify-between">
           <div className="w-60 mb-4">
-            {/* <!-- Select --> */}
-            <select
-              id="filter"
-              defaultValue={filter}
-              data-hs-select='{
-                "placeholder": "<span class=\"inline-flex items-center\"><svg class=\"flex-shrink-0 size-3.5 me-2\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"/></svg> Filter</span>",
-                "toggleTag": "<button type=\"button\"></button>",
-                "toggleClasses": "hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative py-3 px-4 pe-9 flex text-nowrap w-full cursor-pointer bg-white border border-gray-200 rounded-lg text-start text-sm focus:border-lime-500 focus:ring-lime-500 before:absolute before:inset-0 before:z-[1]",
-                "dropdownClasses": "mt-2 z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg overflow-hidden overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500",
-                "optionClasses": "py-2 px-4 w-full text-sm text-gray-800 cursor-pointer hover:bg-gray-100 rounded-lg focus:outline-none focus:bg-gray-100",
-                "optionTemplate": "<div class=\"flex justify-between items-center w-full\"><span data-title></span><span class=\"hidden hs-selected:block\"><svg class=\"flex-shrink-0 size-3.5 text-blue-600 dark:text-blue-500\" xmlns=\"http:.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg></span></div>",
-                "extraMarkup": "<div class=\"absolute top-1/2 end-3 -translate-y-1/2\"><svg class=\"flex-shrink-0 size-3.5 text-gray-500 dark:text-neutral-500\" xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/></svg></div>"
-              }'
-              className=""
-            >
-              {/* <option value="">Filter</option> */}
-              <option value="0">Default</option>
-              <option value="1">Expired Date (Ascending)</option>
-              <option value="-1">Expired Date (Descending)</option>
-            </select>
-            {/* <!-- End Select --> */}
+            {/* <!-- Filter --> */}
+            <div className="hs-dropdown relative inline-flex">
+              <button
+                id="hs-dropdown-default"
+                type="button"
+                className="hs-dropdown-toggle w-60 py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <svg
+                  className="flex-shrink-0 size-3.5 me-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+                Filter
+              </button>
+
+              <div
+                className="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden min-w-60 bg-white shadow-md rounded-lg p-2 mt-2 after:h-4 after:absolute after:-bottom-4 after:start-0 after:w-full before:h-4 before:absolute before:-top-4 before:start-0 before:w-full"
+                aria-labelledby="hs-dropdown-default"
+              >
+                <button
+                  onClick={() => setFiler(0)}
+                  className="flex w-full items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                >
+                  Default{" "}
+                  {filter === 0 && (
+                    <svg
+                      className="flex-shrink-0 size-3.5 text-emerald-600"
+                      xmlns="http:.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  onClick={() => setFiler(1)}
+                  className="flex w-full items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                >
+                  Expired Date (Ascending)
+                  {filter === 1 && (
+                    <svg
+                      className="flex-shrink-0 size-3.5 text-emerald-600"
+                      xmlns="http:.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  onClick={() => setFiler(-1)}
+                  className="flex w-full items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                >
+                  Expired Date (Descending)
+                  {filter === -1 && (
+                    <svg
+                      className="flex-shrink-0 size-3.5 text-emerald-600"
+                      xmlns="http:.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+            {/* End Filter */}
           </div>
           <div>
             <button
